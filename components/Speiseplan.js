@@ -19,7 +19,7 @@ export default function Speiseplan({ filter }) {
     ],
     donnerstag: [
       { name: "Fischfilet mit Kartoffeln", preis: "5,00 €", kategorie: "Hauptgericht" },
-      { name: "Quinoa Bowl", preis: "4,20 €", kategorie: "Vegetarisch" },
+      { name: "Quinoa Bowl", preis: "4,20 €", kategorie: "Vegan" },
       { name: "Möhrensuppe", preis: "2,80 €", kategorie: "Suppe" }
     ],
     freitag: [
