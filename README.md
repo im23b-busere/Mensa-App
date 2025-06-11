@@ -28,3 +28,11 @@ DB_PASS=<passwort>
 DB_NAME=<datenbank>
 JWT_SECRET=<geheimnis>
 ```
+
+## Datenbankschema
+
+Die Datei `schema.sql` erstellt die benötigten Tabellen. Sie kann zum Beispiel mit folgendem Befehl ausgeführt werden:
+
+```bash
+mysql -u <benutzer> -p <datenbank> < schema.sql
+```
