@@ -17,6 +17,12 @@ Dieses Projekt beinhaltet einfache API-Endpunkte für die Registrierung und Anme
 - **GET /api/protected**
   - Beispiel für eine geschützte Route, die ein gültiges JWT erwartet
 
+## Frontend
+
+Es stehen einfache Seiten unter `/login` und `/register` bereit. Die Formulare
+auf diesen Seiten senden Daten an die entsprechenden API-Endpunkte und speichern
+das erhaltene JWT bei Erfolg im `localStorage`.
+
 ## Konfiguration
 
 Die Datenbankverbindung und das JWT-Geheimnis werden über folgende Umgebungsvariablen konfiguriert:
