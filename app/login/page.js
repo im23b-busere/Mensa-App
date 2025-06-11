@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,8 +26,8 @@ export default function LoginPage() {
         setError(data.error || 'Login fehlgeschlagen');
         return;
       }
-      localStorage.setItem('token', data.token);
-      window.location.href = '/';
+      login(data.token);
+      router.push('/');
     } catch {
       setError('Login fehlgeschlagen');
     }

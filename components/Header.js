@@ -1,15 +1,14 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
-  const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
+  const { isAuthenticated, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    setLoggedIn(false);
+    logout();
     router.push('/');
   };
 
@@ -20,7 +19,7 @@ export default function Header() {
           Mensa-BZZ
         </Link>
         <div className="space-x-6">
-          {loggedIn ? (
+          {isAuthenticated ? (
             <button onClick={handleLogout} className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
               Logout
             </button>
