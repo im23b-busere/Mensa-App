@@ -7,10 +7,6 @@ export default function Header() {
   const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    setLoggedIn(!!localStorage.getItem('token'));
-  }, []);
-
   const handleLogout = () => {
     localStorage.removeItem('token');
     setLoggedIn(false);

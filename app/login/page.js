@@ -25,7 +25,7 @@ export default function LoginPage() {
         return;
       }
       localStorage.setItem('token', data.token);
-      router.push('/');
+      window.location.href = '/';
     } catch {
       setError('Login fehlgeschlagen');
     }
