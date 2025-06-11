@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyToken } from '@/middleware/auth';
+import { verifyToken } from '../../../middleware/auth';
 import pool from '../../../lib/db';
 
 export async function POST(req) {
