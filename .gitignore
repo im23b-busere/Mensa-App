@@ -1,0 +1,25 @@
+# IDE settings (WebStorm, IntelliJ)
+.idea/
+*.iml
+
+# Build output
+.next/
+out/
+
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Optional: .env files (falls verwendet)
+.env
+.env.local
+.env.*.local
+
