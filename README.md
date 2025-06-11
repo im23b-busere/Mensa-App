@@ -42,3 +42,9 @@ Die Datei `schema.sql` erstellt die benötigten Tabellen. Sie kann zum Beispiel 
 ```bash
 mysql -u <benutzer> -p <datenbank> < schema.sql
 ```
+
+- **POST /api/order**
+  - Authentifizierung per JWT erforderlich (Authorization Header)
+  - Felder: `mealName`, `date`, `time`
+  - Speichert eine Vorbestellung in der Datenbank und gibt bei Erfolg `{ success: true }` zurück
+
