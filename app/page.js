@@ -139,10 +139,10 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-center mb-3 text-gray-800">{`Menu-${currentDayKey.charAt(0).toUpperCase() + currentDayKey.slice(1)}`}</h1>
           <h2 className="text-2xl font-semibold text-center mb-12 text-gray-700">Hauptgang</h2>
 
-          <div className="space-y-10">
+          <div className="grid gap-10 sm:grid-cols-2">
             {menuItems.map((item, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-white rounded-2xl p-8 shadow-md hover:shadow-lg transition-shadow"
               >
                 <div className="flex flex-col md:flex-row items-center gap-8">
@@ -173,7 +173,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
             ))}
           </div>
         </div>

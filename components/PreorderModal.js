@@ -58,14 +58,20 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
-      <div className="bg-white rounded-lg p-6 w-80 space-y-4">
-        <h3 className="text-lg font-semibold">{meal.title}</h3>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 p-4">
+      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm space-y-4 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+        >
+          ✕
+        </button>
+        <h3 className="text-lg font-semibold text-center">{meal.title}</h3>
         <input
           type="date"
           value={date}
           onChange={e => setDate(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <input
           type="time"
@@ -73,7 +79,7 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
           max="13:00"
           value={time}
           onChange={e => setTime(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         {message && (
           <p
@@ -86,9 +92,19 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
             {message}
           </p>
         )}
-        <div className="flex justify-end space-x-2">
-          <button onClick={onClose} className="px-4 py-2 rounded bg-gray-200">Abbrechen</button>
-          <button onClick={handleOrder} className="px-4 py-2 rounded bg-indigo-600 text-white">Bestellen</button>
+        <div className="flex justify-end space-x-2 pt-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition-colors"
+          >
+            Abbrechen
+          </button>
+          <button
+            onClick={handleOrder}
+            className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+          >
+            Bestellen
+          </button>
         </div>
       </div>
     </div>

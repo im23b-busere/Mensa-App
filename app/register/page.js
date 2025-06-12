@@ -33,9 +33,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="w-full max-w-md space-y-6">
-        <h1 className="text-center text-2xl font-bold text-gray-900">Registrieren</h1>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 space-y-6">
+        <h1 className="text-center text-2xl font-bold">Registrieren</h1>
         {error && <p className="text-center text-red-600">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -44,7 +44,7 @@ export default function RegisterPage() {
             onChange={(e) => setName(e.target.value)}
             required
             placeholder="Name"
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <input
             type="email"
@@ -52,7 +52,7 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="E-Mail-Adresse"
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <input
             type="password"
@@ -60,11 +60,11 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             placeholder="Passwort"
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+            className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-colors"
           >
             Registrieren
           </button>
