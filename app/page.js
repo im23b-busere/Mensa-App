@@ -8,19 +8,22 @@ const menuItems = [
     title: 'Hähnchen-Gemüsepfanne mit Reis',
     image: '/reis_haehnchen_pfanne_2.jpg',
     studentPrice: '10.00',
-    teacherPrice: '12.00'
+    teacherPrice: '12.00',
+    day: 'montag'
   },
   {
     title: 'Spaghetti mit Hackfleisch-Tomatensauce',
     image: '/202_spaghetti-bolognese.jpg',
     studentPrice: '10.00',
-    teacherPrice: '12.00'
+    teacherPrice: '12.00',
+    day: 'montag'
   },
   {
     title: 'Gemüse-Lasagne mit Spinat und Ricotta',
     image: '/Download.jpg',
     studentPrice: '10.00',
-    teacherPrice: '12.00'
+    teacherPrice: '12.00',
+    day: 'montag'
   }
 ];
 

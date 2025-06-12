@@ -10,9 +10,23 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { mealName, date, time } = await req.json();
+  const { mealName, date, time, day } = await req.json();
   if (!mealName || !date || !time) {
     return NextResponse.json({ error: 'Alle Felder erforderlich' }, { status: 400 });
+  }
+
+  // Zeitfenster validieren (11:00 - 13:00)
+  const [hour, minute] = time.split(':').map(Number);
+  if (hour < 11 || hour > 13 || (hour === 13 && minute > 0)) {
+    return NextResponse.json({ error: 'Zeit ausserhalb des erlaubten Fensters' }, { status: 400 });
+  }
+
+  // Wenn ein Tag mitgesendet wird, muss dieser zur gewählten Bestellung passen
+  if (day) {
+    const weekday = new Date(date).toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
+    if (weekday !== day.toLowerCase()) {
+      return NextResponse.json({ error: 'Gericht für diesen Tag nicht verfügbar' }, { status: 400 });
+    }
   }
 
   const pickupAt = `${date} ${time}`;

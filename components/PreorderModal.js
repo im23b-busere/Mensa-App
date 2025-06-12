@@ -12,13 +12,36 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
       setMessage('Bitte zuerst anmelden');
       return;
     }
+
+    // Zeitfenster prüfen (nur zwischen 11:00 und 13:00 Uhr)
+    if (!time) {
+      setMessage('Bitte eine Abholzeit auswählen');
+      return;
+    }
+    const [hour, minute] = time.split(':').map(Number);
+    if (hour < 11 || hour > 13 || (hour === 13 && minute > 0)) {
+      setMessage('Bestellungen sind nur von 11:00 bis 13:00 Uhr möglich');
+      return;
+    }
+
+    // Tag prüfen, falls im Meal definiert
+    if (meal.day && date) {
+      const weekday = new Date(date)
+        .toLocaleDateString('de-DE', { weekday: 'long' })
+        .toLowerCase();
+      if (weekday !== meal.day.toLowerCase()) {
+        setMessage('Dieses Gericht ist an diesem Tag nicht verfügbar');
+        return;
+      }
+    }
+
     const res = await fetch('/api/order', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ mealName: meal.title, date, time }),
+      body: JSON.stringify({ mealName: meal.title, date, time, day: meal.day }),
     });
     if (res.ok) {
       setMessage('Vorbestellung erfolgreich!');
@@ -46,6 +69,8 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
         />
         <input
           type="time"
+          min="11:00"
+          max="13:00"
           value={time}
           onChange={e => setTime(e.target.value)}
           className="w-full border p-2 rounded"
