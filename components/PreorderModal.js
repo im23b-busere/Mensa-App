@@ -30,7 +30,7 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
         .toLocaleDateString('de-DE', { weekday: 'long' })
         .toLowerCase();
       if (weekday !== meal.day.toLowerCase()) {
-        setMessage('Dieses Gericht ist an diesem Tag nicht verfügbar');
+        setMessage('Gericht an diesem Tag nicht verfügbar');
         return;
       }
     }
@@ -75,7 +75,17 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
           onChange={e => setTime(e.target.value)}
           className="w-full border p-2 rounded"
         />
-        {message && <p className="text-center text-sm text-green-600">{message}</p>}
+        {message && (
+          <p
+            className={`text-center text-sm ${
+              message.toLowerCase().includes('erfolgreich')
+                ? 'text-green-600'
+                : 'text-red-600'
+            }`}
+          >
+            {message}
+          </p>
+        )}
         <div className="flex justify-end space-x-2">
           <button onClick={onClose} className="px-4 py-2 rounded bg-gray-200">Abbrechen</button>
           <button onClick={handleOrder} className="px-4 py-2 rounded bg-indigo-600 text-white">Bestellen</button>

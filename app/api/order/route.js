@@ -25,7 +25,7 @@ export async function POST(req) {
   if (day) {
     const weekday = new Date(date).toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
     if (weekday !== day.toLowerCase()) {
-      return NextResponse.json({ error: 'Gericht für diesen Tag nicht verfügbar' }, { status: 400 });
+      return NextResponse.json({ error: 'Gericht an diesem Tag nicht verfügbar' }, { status: 400 });
     }
   }
 
