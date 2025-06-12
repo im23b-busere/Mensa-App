@@ -46,5 +46,7 @@ mysql -u <benutzer> -p <datenbank> < schema.sql
 - **POST /api/order**
   - Authentifizierung per JWT erforderlich (Authorization Header)
   - Felder: `mealName`, `date`, `time`
+  - Bestellungen sind nur von 11:00 bis 13:00 Uhr möglich
+  - Das gewählte Datum muss dem Tag entsprechen, an dem das Gericht angeboten wird
   - Speichert eine Vorbestellung in der Datenbank und gibt bei Erfolg `{ success: true }` zurück
 
