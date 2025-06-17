@@ -30,3 +30,21 @@ CREATE TABLE IF NOT EXISTS `menus` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Seed default menus so they can be managed like normal entries
+INSERT INTO `menus` (`title`, `image`, `student_price`, `teacher_price`, `day`) VALUES
+('H\xE4hnchen-Gem\xFCsepfanne mit Reis', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'montag'),
+('Spaghetti mit Hackfleisch-Tomatensauce', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'montag'),
+('Gem\xFCse-Lasagne mit Spinat und Ricotta', '/Download.jpg', 10.00, 12.00, 'montag'),
+('Rindergeschnetzeltes mit Reis', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'dienstag'),
+('Penne Arrabiata', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'dienstag'),
+('Gem\xFCse-Curry', '/Download.jpg', 10.00, 12.00, 'dienstag'),
+('Fischst\xE4bchen mit Kartoffelsalat', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'mittwoch'),
+('K\xE4sesp\xE4tzle', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'mittwoch'),
+('Tomaten-Mozzarella-Auflauf', '/Download.jpg', 10.00, 12.00, 'mittwoch'),
+('Schweinebraten mit Kn\xF6del', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'donnerstag'),
+('Nudelauflauf', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'donnerstag'),
+('Gr\xFCne Bohnen Eintopf', '/Download.jpg', 10.00, 12.00, 'donnerstag'),
+('Currywurst mit Pommes', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'freitag'),
+('Pizza Margherita', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'freitag'),
+('Linsensuppe', '/Download.jpg', 10.00, 12.00, 'freitag');
