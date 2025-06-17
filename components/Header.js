@@ -2,10 +2,12 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 export default function Header() {
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
+  const { cartItems } = useCart();
 
   const handleLogout = () => {
     logout();
@@ -19,6 +21,9 @@ export default function Header() {
           Mensa-BZZ
         </Link>
         <div className="space-x-6">
+          <Link href="/cart" className="text-gray-600 hover:text-primary-dark font-medium transition-colors">
+            Warenkorb ({cartItems.length})
+          </Link>
           {isAuthenticated ? (
             <button onClick={handleLogout} className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
               Logout

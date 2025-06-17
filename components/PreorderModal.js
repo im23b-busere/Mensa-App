@@ -1,10 +1,34 @@
 'use client';
 import { useState } from 'react';
+import { useCart } from '../context/CartContext';
 
 export default function PreorderModal({ meal, isOpen, onClose }) {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [message, setMessage] = useState('');
+  const { addItem } = useCart();
+
+  const validate = () => {
+    if (!time) {
+      setMessage('Bitte eine Abholzeit auswählen');
+      return false;
+    }
+    const [hour, minute] = time.split(':').map(Number);
+    if (hour < 11 || hour > 13 || (hour === 13 && minute > 0)) {
+      setMessage('Bestellungen sind nur von 11:00 bis 13:00 Uhr möglich');
+      return false;
+    }
+    if (meal.day && date) {
+      const weekday = new Date(date)
+        .toLocaleDateString('de-DE', { weekday: 'long' })
+        .toLowerCase();
+      if (weekday !== meal.day.toLowerCase()) {
+        setMessage('Gericht an diesem Tag nicht verfügbar');
+        return false;
+      }
+    }
+    return true;
+  };
 
   const handleOrder = async () => {
     const token = localStorage.getItem('token');
@@ -12,28 +36,7 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
       setMessage('Bitte zuerst anmelden');
       return;
     }
-
-    // Zeitfenster prüfen (nur zwischen 11:00 und 13:00 Uhr)
-    if (!time) {
-      setMessage('Bitte eine Abholzeit auswählen');
-      return;
-    }
-    const [hour, minute] = time.split(':').map(Number);
-    if (hour < 11 || hour > 13 || (hour === 13 && minute > 0)) {
-      setMessage('Bestellungen sind nur von 11:00 bis 13:00 Uhr möglich');
-      return;
-    }
-
-    // Tag prüfen, falls im Meal definiert
-    if (meal.day && date) {
-      const weekday = new Date(date)
-        .toLocaleDateString('de-DE', { weekday: 'long' })
-        .toLowerCase();
-      if (weekday !== meal.day.toLowerCase()) {
-        setMessage('Gericht an diesem Tag nicht verfügbar');
-        return;
-      }
-    }
+    if (!validate()) return;
 
     const res = await fetch('/api/order', {
       method: 'POST',
@@ -53,6 +56,16 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
       const data = await res.json();
       setMessage(data.error || 'Fehler beim Bestellen');
     }
+  };
+
+  const handleAddToCart = () => {
+    if (!validate()) return;
+    addItem({ mealName: meal.title, date, time, day: meal.day });
+    setMessage('Zum Warenkorb hinzugefügt');
+    setTimeout(() => {
+      setMessage('');
+      onClose();
+    }, 1000);
   };
 
   if (!isOpen) return null;
@@ -88,6 +101,7 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
         )}
         <div className="flex justify-end space-x-2">
           <button onClick={onClose} className="px-4 py-2 rounded bg-gray-200">Abbrechen</button>
+          <button onClick={handleAddToCart} className="px-4 py-2 rounded bg-primary text-white">Zum Warenkorb</button>
           <button onClick={handleOrder} className="px-4 py-2 rounded bg-primary text-white">Bestellen</button>
         </div>
       </div>

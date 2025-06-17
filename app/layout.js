@@ -1,6 +1,7 @@
 import './globals.css';
 import Header from '../components/Header';
 import { AuthProvider } from '../context/AuthContext';
+import { CartProvider } from '../context/CartContext';
 
 export const metadata = {
   title: 'Mensa-BZZ',
@@ -12,8 +13,10 @@ export default function RootLayout({ children }) {
     <html lang="de">
       <body className="bg-gray-50 text-gray-800 font-sans">
         <AuthProvider>
-          <Header />
-          <div className="pt-20">{children}</div>
+          <CartProvider>
+            <Header />
+            <div className="pt-20">{children}</div>
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>
