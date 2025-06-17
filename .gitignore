@@ -9,6 +9,9 @@ out/
 # Node modules
 node_modules/
 
+# Uploaded images
+public/uploads/
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

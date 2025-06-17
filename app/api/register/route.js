@@ -18,12 +18,12 @@ export async function POST(req) {
   try {
     const hashed = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
-      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-      [name, email, hashed]
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email, hashed, 'user']
     );
 
     const token = jwt.sign(
-      { id: result.insertId, name, email },
+      { id: result.insertId, name, email, role: 'user' },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
