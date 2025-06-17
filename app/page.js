@@ -135,7 +135,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 pt-8 pb-24">
-        <div className="max-w-4xl mx-auto bg-[#fdf1cc] rounded-3xl p-8 shadow-lg">
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 shadow-lg">
           <h1 className="text-4xl font-bold text-center mb-3 text-gray-800">{`Menu-${currentDayKey.charAt(0).toUpperCase() + currentDayKey.slice(1)}`}</h1>
           <h2 className="text-2xl font-semibold text-center mb-12 text-gray-700">Hauptgang</h2>
 
@@ -166,7 +166,7 @@ export default function Home() {
                   <div className="mt-4">
                     <button
                       onClick={() => setSelectedMeal(item)}
-                      className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+                      className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark"
                     >
                       Vorbestellen
                     </button>
@@ -202,8 +202,8 @@ export default function Home() {
                   onClick={() => setCurrentDay(index)}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     currentDay === index
-                      ? 'font-bold text-gray-800 bg-gray-100'
-                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                      ? 'font-bold text-primary bg-gray-100'
+                      : 'text-gray-600 hover:text-primary hover:bg-gray-50'
                   }`}
                 >
                   {day}
