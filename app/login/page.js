@@ -35,7 +35,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-xl shadow">
         <h1 className="text-center text-2xl font-bold text-gray-900">Anmelden</h1>
         {error && <p className="text-center text-red-600">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -57,14 +57,14 @@ export default function LoginPage() {
           />
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+            className="w-full bg-primary text-white py-2 rounded hover:bg-primary-dark"
           >
             Anmelden
           </button>
         </form>
         <p className="text-center text-sm">
           Noch keinen Account?{' '}
-          <Link href="/register" className="text-indigo-600 hover:underline">
+          <Link href="/register" className="text-primary hover:underline">
             Registrieren
           </Link>
         </p>

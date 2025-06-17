@@ -88,7 +88,7 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
         )}
         <div className="flex justify-end space-x-2">
           <button onClick={onClose} className="px-4 py-2 rounded bg-gray-200">Abbrechen</button>
-          <button onClick={handleOrder} className="px-4 py-2 rounded bg-indigo-600 text-white">Bestellen</button>
+          <button onClick={handleOrder} className="px-4 py-2 rounded bg-primary text-white">Bestellen</button>
         </div>
       </div>
     </div>

@@ -34,7 +34,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-xl shadow">
         <h1 className="text-center text-2xl font-bold text-gray-900">Registrieren</h1>
         {error && <p className="text-center text-red-600">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -64,14 +64,14 @@ export default function RegisterPage() {
           />
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+            className="w-full bg-primary text-white py-2 rounded hover:bg-primary-dark"
           >
             Registrieren
           </button>
         </form>
         <p className="text-center text-sm">
           Bereits registriert?{' '}
-          <Link href="/login" className="text-indigo-600 hover:underline">
+          <Link href="/login" className="text-primary hover:underline">
             Anmelden
           </Link>
         </p>
