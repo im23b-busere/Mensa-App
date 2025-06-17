@@ -7,6 +7,139 @@ import { useAuth } from '../context/AuthContext';
 const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
 const dayKeys = ['montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag'];
 
+const defaultMenus = {
+  montag: [
+    {
+      id: 'default-montag-1',
+      title: 'H\xE4hnchen-Gem\xFCsepfanne mit Reis',
+      image: '/reis_haehnchen_pfanne_2.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'montag',
+    },
+    {
+      id: 'default-montag-2',
+      title: 'Spaghetti mit Hackfleisch-Tomatensauce',
+      image: '/202_spaghetti-bolognese.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'montag',
+    },
+    {
+      id: 'default-montag-3',
+      title: 'Gem\xFCse-Lasagne mit Spinat und Ricotta',
+      image: '/Download.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'montag',
+    },
+  ],
+  dienstag: [
+    {
+      id: 'default-dienstag-1',
+      title: 'Rindergeschnetzeltes mit Reis',
+      image: '/reis_haehnchen_pfanne_2.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'dienstag',
+    },
+    {
+      id: 'default-dienstag-2',
+      title: 'Penne Arrabiata',
+      image: '/202_spaghetti-bolognese.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'dienstag',
+    },
+    {
+      id: 'default-dienstag-3',
+      title: 'Gem\xFCse-Curry',
+      image: '/Download.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'dienstag',
+    },
+  ],
+  mittwoch: [
+    {
+      id: 'default-mittwoch-1',
+      title: 'Fischst\xE4bchen mit Kartoffelsalat',
+      image: '/reis_haehnchen_pfanne_2.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'mittwoch',
+    },
+    {
+      id: 'default-mittwoch-2',
+      title: 'K\xE4sesp\xE4tzle',
+      image: '/202_spaghetti-bolognese.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'mittwoch',
+    },
+    {
+      id: 'default-mittwoch-3',
+      title: 'Tomaten-Mozzarella-Auflauf',
+      image: '/Download.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'mittwoch',
+    },
+  ],
+  donnerstag: [
+    {
+      id: 'default-donnerstag-1',
+      title: 'Schweinebraten mit Kn\xF6del',
+      image: '/reis_haehnchen_pfanne_2.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'donnerstag',
+    },
+    {
+      id: 'default-donnerstag-2',
+      title: 'Nudelauflauf',
+      image: '/202_spaghetti-bolognese.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'donnerstag',
+    },
+    {
+      id: 'default-donnerstag-3',
+      title: 'Gr\xFCne Bohnen Eintopf',
+      image: '/Download.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'donnerstag',
+    },
+  ],
+  freitag: [
+    {
+      id: 'default-freitag-1',
+      title: 'Currywurst mit Pommes',
+      image: '/reis_haehnchen_pfanne_2.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'freitag',
+    },
+    {
+      id: 'default-freitag-2',
+      title: 'Pizza Margherita',
+      image: '/202_spaghetti-bolognese.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'freitag',
+    },
+    {
+      id: 'default-freitag-3',
+      title: 'Linsensuppe',
+      image: '/Download.jpg',
+      student_price: '10.00',
+      teacher_price: '12.00',
+      day: 'freitag',
+    },
+  ],
+};
+
 export default function Home() {
   const [currentDay, setCurrentDay] = useState(0);
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -15,16 +148,18 @@ export default function Home() {
   const [editing, setEditing] = useState(null);
   const { user } = useAuth();
 
+  const fetchMenus = async () => {
+    const res = await fetch('/api/menus');
+    const data = await res.json();
+    const grouped = dayKeys.reduce((acc, key) => {
+      const fromDb = data.menus.filter(m => m.day === key);
+      acc[key] = [...defaultMenus[key], ...fromDb];
+      return acc;
+    }, {});
+    setMenus(grouped);
+  };
+
   useEffect(() => {
-    const fetchMenus = async () => {
-      const res = await fetch('/api/menus');
-      const data = await res.json();
-      const grouped = dayKeys.reduce((acc, key) => {
-        acc[key] = data.menus.filter(m => m.day === key);
-        return acc;
-      }, {});
-      setMenus(grouped);
-    };
     fetchMenus();
   }, [showForm]);
 
@@ -35,6 +170,7 @@ export default function Home() {
       headers: { Authorization: `Bearer ${token}` },
     });
     setShowForm(false);
+    fetchMenus();
   };
 
   const handleEdit = (meal) => {
