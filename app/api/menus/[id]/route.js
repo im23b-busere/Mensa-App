@@ -38,6 +38,8 @@ export async function PUT(req, { params }) {
   const teacherPrice = formData.get('teacherPrice');
   const day = formData.get('day');
   const file = formData.get('image');
+  const ingredients = formData.get('ingredients') || '';
+  const allergens = formData.get('allergens') || '';
 
   if (!title || !studentPrice || !teacherPrice || !day) {
     return NextResponse.json({ error: 'Alle Felder erforderlich' }, { status: 400 });
@@ -55,9 +57,9 @@ export async function PUT(req, { params }) {
   }
 
   try {
-    const fields = [title, studentPrice, teacherPrice, day];
+    const fields = [title, studentPrice, teacherPrice, day, ingredients, allergens];
     let query =
-      'UPDATE menus SET title=?, student_price=?, teacher_price=?, day=?';
+      'UPDATE menus SET title=?, student_price=?, teacher_price=?, day=?, ingredients=?, allergens=?';
     if (imagePath) {
       query += ', image=?';
       fields.push(imagePath);

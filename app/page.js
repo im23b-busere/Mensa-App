@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import PreorderModal from '../components/PreorderModal';
+import InfoModal from '../components/InfoModal';
 import { useAuth } from '../context/AuthContext';
 
 const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
@@ -11,6 +12,7 @@ const dayKeys = ['montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag'];
 export default function Home() {
   const [currentDay, setCurrentDay] = useState(0);
   const [selectedMeal, setSelectedMeal] = useState(null);
+  const [infoMeal, setInfoMeal] = useState(null);
   const [menus, setMenus] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -97,6 +99,13 @@ export default function Home() {
                       >
                         Vorbestellen
                       </button>
+                      <button
+                        onClick={() => setInfoMeal(item)}
+                        className="p-2 text-blue-600 hover:bg-gray-100 rounded-full"
+                        aria-label="Details"
+                      >
+                        i
+                      </button>
                       {user?.role === 'admin' && (
                         <>
                           <button
@@ -122,6 +131,7 @@ export default function Home() {
         </div>
       </main>
       <PreorderModal meal={selectedMeal || {}} isOpen={selectedMeal !== null} onClose={() => setSelectedMeal(null)} />
+      <InfoModal meal={infoMeal || {}} isOpen={infoMeal !== null} onClose={() => setInfoMeal(null)} />
       {showForm && <MealForm day={currentDayKey} meal={editing} onClose={() => setShowForm(false)} />}
       <footer className="fixed bottom-0 left-0 right-0 bg-white shadow-sm">
         <div className="container mx-auto px-6 py-4">
@@ -165,6 +175,8 @@ function MealForm({ day, meal, onClose }) {
   const [title, setTitle] = useState(meal?.title || '');
   const [studentPrice, setStudentPrice] = useState(meal?.student_price || '');
   const [teacherPrice, setTeacherPrice] = useState(meal?.teacher_price || '');
+  const [ingredients, setIngredients] = useState(meal?.ingredients || '');
+  const [allergens, setAllergens] = useState(meal?.allergens || '');
   const [image, setImage] = useState(null);
 
   const handleSubmit = async () => {
@@ -174,6 +186,8 @@ function MealForm({ day, meal, onClose }) {
     form.append('studentPrice', studentPrice);
     form.append('teacherPrice', teacherPrice);
     form.append('day', day);
+    form.append('ingredients', ingredients);
+    form.append('allergens', allergens);
     if (image) form.append('image', image);
 
     const res = await fetch(isEdit ? `/api/menus/${meal.id}` : '/api/menus', {
@@ -209,6 +223,19 @@ function MealForm({ day, meal, onClose }) {
           value={teacherPrice}
           onChange={e => setTeacherPrice(e.target.value)}
           placeholder="Preis Lehrer"
+          className="w-full border p-2 rounded"
+        />
+        <textarea
+          value={ingredients}
+          onChange={e => setIngredients(e.target.value)}
+          placeholder="Zutaten, kommasepariert"
+          className="w-full border p-2 rounded"
+        />
+        <input
+          type="text"
+          value={allergens}
+          onChange={e => setAllergens(e.target.value)}
+          placeholder="Allergene, kommasepariert"
           className="w-full border p-2 rounded"
         />
         <input type="file" onChange={e => setImage(e.target.files[0])} className="w-full" />

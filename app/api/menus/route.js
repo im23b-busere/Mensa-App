@@ -33,6 +33,8 @@ export async function POST(req) {
   const teacherPrice = formData.get('teacherPrice');
   const day = formData.get('day');
   const file = formData.get('image');
+  const ingredients = formData.get('ingredients') || '';
+  const allergens = formData.get('allergens') || '';
 
   if (!title || !studentPrice || !teacherPrice || !day || !file) {
     return NextResponse.json({ error: 'Alle Felder erforderlich' }, { status: 400 });
@@ -49,10 +51,10 @@ export async function POST(req) {
 
   try {
     const [result] = await pool.query(
-      'INSERT INTO menus (title, image, student_price, teacher_price, day) VALUES (?, ?, ?, ?, ?)',
-      [title, imagePath, studentPrice, teacherPrice, day]
+      'INSERT INTO menus (title, image, student_price, teacher_price, day, ingredients, allergens) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [title, imagePath, studentPrice, teacherPrice, day, ingredients, allergens]
     );
-    return NextResponse.json({ id: result.insertId, title, image: imagePath, student_price: studentPrice, teacher_price: teacherPrice, day });
+    return NextResponse.json({ id: result.insertId, title, image: imagePath, student_price: studentPrice, teacher_price: teacherPrice, day, ingredients, allergens });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Speichern fehlgeschlagen' }, { status: 500 });
