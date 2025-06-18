@@ -1,5 +1,4 @@
 import './globals.css';
-import Header from '../components/Header';
 import { AuthProvider } from '../context/AuthContext';
 
 export const metadata = {
@@ -10,10 +9,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="de">
-      <body className="bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50 text-gray-800 font-sans min-h-screen">
+      <body className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 text-slate-800 font-sans min-h-screen">
         <AuthProvider>
-          <Header />
-          <div className="pt-20">{children}</div>
+          {children}
         </AuthProvider>
       </body>
     </html>
