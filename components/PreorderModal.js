@@ -25,13 +25,24 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
       return;
     }
 
-    // Tag prüfen, falls im Meal definiert
+    // Datum prüfen - muss in der Zukunft liegen
+    if (date) {
+      const selectedDate = new Date(date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        setMessage('Bestellungen können nur für zukünftige Tage getätigt werden');
+        return;
+      }
+    }
+
+    // Tag prüfen - das Gericht muss an dem gewählten Tag verfügbar sein
     if (meal.day && date) {
       const weekday = new Date(date)
         .toLocaleDateString('de-DE', { weekday: 'long' })
         .toLowerCase();
       if (weekday !== meal.day.toLowerCase()) {
-        setMessage('Gericht an diesem Tag nicht verfügbar');
+        setMessage(`Dieses Gericht ist nur am ${meal.day.charAt(0).toUpperCase() + meal.day.slice(1)} verfügbar`);
         return;
       }
     }
@@ -197,7 +208,8 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
             <div className="text-xs text-slate-600">
               <p className="font-medium mb-1">Wichtige Hinweise:</p>
               <ul className="space-y-1">
-                <li>• Bestellungen sind nur für den aktuellen Tag möglich</li>
+                <li>• Bestellungen sind für zukünftige Tage möglich</li>
+                <li>• Gerichte sind nur an ihrem zugewiesenen Tag verfügbar</li>
                 <li>• Abholung zwischen 11:00 und 13:00 Uhr</li>
                 <li>• Bezahlung erfolgt bei der Abholung</li>
               </ul>

@@ -41,6 +41,11 @@ export default function Home() {
     return isToday(meal.day);
   };
 
+  // Funktion um zu prüfen, ob ein Gericht heute verfügbar ist
+  const isMealAvailableToday = (meal) => {
+    return isToday(meal.day);
+  };
+
   // Funktion um Allergen-Info zu öffnen
   const handleAllergenInfo = (meal) => {
     setSelectedMealForAllergen(meal);
@@ -168,6 +173,18 @@ export default function Home() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
                           <span>Abmelden</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            window.location.href = '/orders';
+                            setShowUserDropdown(false);
+                          }}
+                          className="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 transition-colors duration-200 flex items-center space-x-3"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                          </svg>
+                          <span>Bestellhistorie</span>
                         </button>
                       </div>
                     </div>
@@ -297,10 +314,10 @@ export default function Home() {
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-2">
-                          {isOrderable ? (
+                          {isMealAvailableToday(item) ? (
                             <span className="badge badge-success">Heute verfügbar</span>
                           ) : (
-                            <span className="badge badge-primary">Nicht verfügbar</span>
+                            <span className="badge badge-secondary">Nicht heute</span>
                           )}
                           <span className="text-sm text-slate-500">
                             {isCurrentDayToday ? 'Heute' : weekDays[currentDay]}
@@ -344,12 +361,7 @@ export default function Home() {
                       <div className="flex space-x-3">
                         <button
                           onClick={() => setSelectedMeal(item)}
-                          className={`flex-1 font-semibold rounded-lg px-6 py-3 transition-all duration-200 ${
-                            isOrderable 
-                              ? 'btn-primary' 
-                              : 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                          }`}
-                          disabled={!isOrderable}
+                          className="flex-1 font-semibold rounded-lg px-6 py-3 transition-all duration-200 btn-primary"
                         >
                           <span className="flex items-center justify-center space-x-2">
                             <span>Vorbestellen</span>

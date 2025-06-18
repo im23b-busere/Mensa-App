@@ -21,11 +21,19 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Zeit ausserhalb des erlaubten Fensters' }, { status: 400 });
   }
 
-  // Wenn ein Tag mitgesendet wird, muss dieser zur gewählten Bestellung passen
+  // Datum validieren - muss in der Zukunft liegen
+  const selectedDate = new Date(date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (selectedDate < today) {
+    return NextResponse.json({ error: 'Bestellungen können nur für zukünftige Tage getätigt werden' }, { status: 400 });
+  }
+
+  // Tag validieren - das Gericht muss an dem gewählten Tag verfügbar sein
   if (day) {
     const weekday = new Date(date).toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
     if (weekday !== day.toLowerCase()) {
-      return NextResponse.json({ error: 'Gericht an diesem Tag nicht verfügbar' }, { status: 400 });
+      return NextResponse.json({ error: `Dieses Gericht ist nur am ${day.charAt(0).toUpperCase() + day.slice(1)} verfügbar` }, { status: 400 });
     }
   }
 
