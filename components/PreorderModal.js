@@ -1,220 +1,320 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function PreorderModal({ meal, isOpen, onClose }) {
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [message, setMessage] = useState('');
+  // State für Formular und UI
+  const [pickupTime, setPickupTime] = useState('');
+  const [pickupDate, setPickupDate] = useState('');
+  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const { user } = useAuth();
 
-  const handleOrder = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setMessage('Bitte zuerst anmelden');
-      return;
-    }
+  // Prüft ob ein Tag heute ist
+  const isToday = (dayKey) => {
+    const today = new Date();
+    const dayNames = ['sonntag', 'montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag'];
+    const todayName = dayNames[today.getDay()];
+    return todayName === dayKey;
+  };
 
-    // Zeitfenster prüfen (nur zwischen 11:00 und 13:00 Uhr)
-    if (!time) {
-      setMessage('Bitte eine Abholzeit auswählen');
-      return;
-    }
-    const [hour, minute] = time.split(':').map(Number);
-    if (hour < 11 || hour > 13 || (hour === 13 && minute > 0)) {
-      setMessage('Bestellungen sind nur von 11:00 bis 13:00 Uhr möglich');
-      return;
-    }
+  // Prüft ob ein Gericht heute verfügbar ist
+  const isMealAvailableToday = (meal) => {
+    return isToday(meal.day);
+  };
 
-    // Datum prüfen - muss in der Zukunft liegen
-    if (date) {
-      const selectedDate = new Date(date);
+  // Setzt Standard-Werte beim Öffnen des Modals
+  useEffect(() => {
+    if (isOpen && meal) {
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selectedDate < today) {
-        setMessage('Bestellungen können nur für zukünftige Tage getätigt werden');
-        return;
-      }
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // Setze Standard-Zeit und Datum
+      setPickupTime('12:00');
+      setPickupDate(tomorrow.toISOString().split('T')[0]);
+      setQuantity(1);
+      setError('');
+      setSuccess(false);
+    }
+  }, [isOpen, meal]);
+
+  // Schließt Modal und setzt State zurück
+  const handleClose = () => {
+    setPickupTime('');
+    setPickupDate('');
+    setQuantity(1);
+    setError('');
+    setSuccess(false);
+    onClose();
+  };
+
+  // Validiert die Eingaben
+  const validateForm = () => {
+    if (!pickupTime || !pickupDate) {
+      setError('Bitte füllen Sie alle Felder aus.');
+      return false;
     }
 
-    // Tag prüfen - das Gericht muss an dem gewählten Tag verfügbar sein
-    if (meal.day && date) {
-      const weekday = new Date(date)
-        .toLocaleDateString('de-DE', { weekday: 'long' })
-        .toLowerCase();
-      if (weekday !== meal.day.toLowerCase()) {
-        setMessage(`Dieses Gericht ist nur am ${meal.day.charAt(0).toUpperCase() + meal.day.slice(1)} verfügbar`);
-        return;
-      }
+    const selectedDateTime = new Date(`${pickupDate}T${pickupTime}`);
+    const now = new Date();
+    
+    // Prüfe ob Datum in der Zukunft liegt
+    if (selectedDateTime <= now) {
+      setError('Die Abholzeit muss in der Zukunft liegen.');
+      return false;
     }
+
+    // Prüfe ob Datum nicht zu weit in der Zukunft liegt (max. 7 Tage)
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 7);
+    if (selectedDateTime > maxDate) {
+      setError('Bestellungen sind nur bis zu 7 Tage im Voraus möglich.');
+      return false;
+    }
+
+    // Prüfe ob das Gericht am gewählten Tag verfügbar ist
+    const selectedDay = selectedDateTime.toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
+    const mealDay = meal.day;
+    
+    if (selectedDay !== mealDay) {
+      setError(`Dieses Gericht ist nur am ${mealDay.charAt(0).toUpperCase() + mealDay.slice(1)} verfügbar.`);
+      return false;
+    }
+
+    // Prüfe Abholzeit (nur zwischen 11:00 und 13:00)
+    const hour = parseInt(pickupTime.split(':')[0]);
+    if (hour < 11 || hour >= 13) {
+      setError('Abholungen sind nur zwischen 11:00 und 13:00 Uhr möglich.');
+      return false;
+    }
+
+    return true;
+  };
+
+  // Sendet Bestellung an API
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
 
     setLoading(true);
+    setError('');
+
     try {
-      const res = await fetch('/api/order', {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ mealName: meal.title, date, time, day: meal.day }),
+        body: JSON.stringify({
+          mealId: meal.id,
+          pickupTime: `${pickupDate}T${pickupTime}:00`,
+          quantity: quantity
+        })
       });
-      
-      if (res.ok) {
-        setMessage('Vorbestellung erfolgreich!');
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
         setTimeout(() => {
-          setMessage('');
-          onClose();
+          handleClose();
         }, 2000);
       } else {
-        const data = await res.json();
-        setMessage(data.error || 'Fehler beim Bestellen');
+        setError(data.error || 'Ein Fehler ist aufgetreten.');
       }
     } catch (error) {
-      console.error('Fehler beim Bestellen:', error);
-      setMessage('Netzwerkfehler beim Bestellen');
+      setError('Netzwerkfehler. Bitte versuchen Sie es erneut.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
+  // Generiert verfügbare Zeiten für Abholung
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 11; hour < 13; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        slots.push(time);
+      }
+    }
+    return slots;
+  };
+
+  // Generiert verfügbare Daten (nächste 7 Tage)
+  const generateDateSlots = () => {
+    const dates = [];
+    const today = new Date();
+    
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      dates.push({
+        value: date.toISOString().split('T')[0],
+        label: date.toLocaleDateString('de-DE', { 
+          weekday: 'long', 
+          day: 'numeric', 
+          month: 'long' 
+        })
+      });
+    }
+    return dates;
+  };
+
+  if (!isOpen || !meal) return null;
+
+  const timeSlots = generateTimeSlots();
+  const dateSlots = generateDateSlots();
+  const isAvailableToday = isMealAvailableToday(meal);
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4">
-      <div className="bg-white rounded-2xl p-6 sm:p-8 w-full max-w-md shadow-2xl border border-white/20 slide-up">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        {/* Modal Header */}
+        <div className="p-6 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-slate-800">Vorbestellung</h2>
+            <button
+              onClick={handleClose}
+              className="text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </div>
-            <div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-800">Vorbestellung</h3>
-              <p className="text-xs sm:text-sm text-slate-500">Bestellen Sie Ihr Gericht</p>
-            </div>
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all duration-200"
-          >
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
         </div>
 
-        {/* Meal Info */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 border border-blue-100">
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h4 className="font-semibold text-slate-800 text-base sm:text-lg">{meal.title}</h4>
-              <div className="flex items-center space-x-3 sm:space-x-4 mt-1">
-                <div className="text-center">
-                  <p className="text-xs text-slate-500">Schüler</p>
-                  <p className="font-bold text-blue-600 text-sm sm:text-base">{meal.student_price} CHF</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-slate-500">Lehrer</p>
-                  <p className="font-bold text-blue-600 text-sm sm:text-base">{meal.teacher_price} CHF</p>
-                </div>
+        {/* Modal Content */}
+        <div className="p-6">
+          {/* Gericht-Info */}
+          <div className="mb-6">
+            <div className="flex items-center space-x-4">
+              <img 
+                src={meal.image} 
+                alt={meal.title} 
+                className="w-16 h-16 rounded-lg object-cover"
+              />
+              <div>
+                <h3 className="font-semibold text-slate-800">{meal.title}</h3>
+                <p className="text-sm text-slate-600">
+                  {isAvailableToday ? 'Heute verfügbar' : `Verfügbar am ${meal.day.charAt(0).toUpperCase() + meal.day.slice(1)}`}
+                </p>
+                <p className="text-sm text-slate-500">
+                  Schüler: {meal.student_price} CHF | Lehrer: {meal.teacher_price} CHF
+                </p>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Form */}
-        <div className="space-y-3 sm:space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Abholdatum
-            </label>
-            <input
-              type="date"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              className="input-field"
-              min={new Date().toISOString().split('T')[0]}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Abholzeit
-            </label>
-            <input
-              type="time"
-              min="11:00"
-              max="13:00"
-              value={time}
-              onChange={e => setTime(e.target.value)}
-              className="input-field"
-            />
-            <p className="text-xs text-slate-500 mt-1">
-              Bestellungen nur von 11:00 bis 13:00 Uhr möglich
-            </p>
-          </div>
-
-          {/* Message */}
-          {message && (
-            <div className={`p-3 rounded-xl text-sm font-medium ${
-              message.toLowerCase().includes('erfolgreich')
-                ? 'bg-green-50 text-green-700 border border-green-200'
-                : 'bg-red-50 text-red-700 border border-red-200'
-            }`}>
-              {message}
+          {/* Bestellformular */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Datum-Auswahl */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Abholdatum
+              </label>
+              <select
+                value={pickupDate}
+                onChange={(e) => setPickupDate(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              >
+                <option value="">Datum auswählen</option>
+                {dateSlots.map((date) => (
+                  <option key={date.value} value={date.value}>
+                    {date.label}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
 
-          {/* Action Buttons */}
-          <div className="flex space-x-2 sm:space-x-3 pt-3 sm:pt-4">
-            <button 
-              onClick={onClose} 
-              className="btn-secondary flex-1 text-sm sm:text-base"
-              disabled={loading}
-            >
-              Abbrechen
-            </button>
-            <button 
-              onClick={handleOrder} 
-              className="btn-primary flex-1 text-sm sm:text-base"
-              disabled={loading}
-            >
-              {loading ? (
-                <span className="flex items-center justify-center space-x-2">
-                  <div className="spinner w-3 h-3 sm:w-4 sm:h-4"></div>
-                  <span>Bestelle...</span>
-                </span>
-              ) : (
-                <span className="flex items-center justify-center space-x-2">
-                  <span>Bestellen</span>
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Info Box */}
-        <div className="mt-4 sm:mt-6 p-3 bg-slate-50 rounded-xl border border-slate-200">
-          <div className="flex items-start space-x-2">
-            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div className="text-xs text-slate-600">
-              <p className="font-medium mb-1">Wichtige Hinweise:</p>
-              <ul className="space-y-1">
-                <li>• Bestellungen sind für zukünftige Tage möglich</li>
-                <li>• Gerichte sind nur an ihrem zugewiesenen Tag verfügbar</li>
-                <li>• Abholung zwischen 11:00 und 13:00 Uhr</li>
-                <li>• Bezahlung erfolgt bei der Abholung</li>
-              </ul>
+            {/* Zeit-Auswahl */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Abholzeit
+              </label>
+              <select
+                value={pickupTime}
+                onChange={(e) => setPickupTime(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              >
+                <option value="">Zeit auswählen</option>
+                {timeSlots.map((time) => (
+                  <option key={time} value={time}>
+                    {time} Uhr
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
+
+            {/* Menge-Auswahl */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Menge
+              </label>
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 rounded-lg border border-slate-300 flex items-center justify-center hover:bg-slate-50 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                  </svg>
+                </button>
+                <span className="text-lg font-semibold min-w-[3rem] text-center">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 rounded-lg border border-slate-300 flex items-center justify-center hover:bg-slate-50 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Fehler-Anzeige */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            {/* Erfolg-Anzeige */}
+            {success && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-green-600 text-sm">Bestellung erfolgreich aufgegeben!</p>
+              </div>
+            )}
+
+            {/* Aktions-Buttons */}
+            <div className="flex space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Abbrechen
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {loading ? 'Wird bestellt...' : 'Bestellen'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

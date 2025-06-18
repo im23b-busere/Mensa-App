@@ -2,64 +2,126 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 
+// Auth Context für Benutzer-Management
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // State für Benutzer und Authentifizierung
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Beim Laden der App prüfen, ob bereits ein Token existiert
+  // Prüft gespeicherten Token beim Start
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const userData = JSON.parse(atob(token.split('.')[1]));
-        // Prüfen, ob der Token noch gültig ist (nicht abgelaufen)
-        const currentTime = Date.now() / 1000;
-        if (userData.exp && userData.exp > currentTime) {
-          setIsAuthenticated(true);
-          setUser(userData);
-        } else {
-          // Token ist abgelaufen, entfernen
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await fetch('/api/protected', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData.user);
+          } else {
+            // Token ungültig - entferne ihn
+            localStorage.removeItem('token');
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
           localStorage.removeItem('token');
         }
-      } catch (error) {
-        console.error('Fehler beim Dekodieren des gespeicherten Tokens:', error);
-        localStorage.removeItem('token');
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
-  const login = (token) => {
-    localStorage.setItem('token', token);
-    setIsAuthenticated(true);
+  // Login-Funktion
+  const login = async (email, password) => {
     try {
-      const userData = JSON.parse(atob(token.split('.')[1]));
-      setUser(userData);
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setUser(data.user);
+        return { success: true };
+      } else {
+        return { success: false, error: data.error };
+      }
     } catch (error) {
-      console.error('Fehler beim Dekodieren des Tokens:', error);
+      return { success: false, error: 'Netzwerkfehler' };
     }
   };
 
+  // Registrierungs-Funktion
+  const register = async (name, email, password, role = 'student') => {
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password, role }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setUser(data.user);
+        return { success: true };
+      } else {
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      return { success: false, error: 'Netzwerkfehler' };
+    }
+  };
+
+  // Logout-Funktion
   const logout = () => {
     localStorage.removeItem('token');
-    setIsAuthenticated(false);
     setUser(null);
   };
 
+  // Prüft ob Benutzer Admin ist
+  const isAdmin = () => {
+    return user?.role === 'admin';
+  };
+
+  const value = {
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    isAdmin,
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, loading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 }
 
+// Hook für einfache Verwendung des Auth Context
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth muss innerhalb eines AuthProviders verwendet werden');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 } 

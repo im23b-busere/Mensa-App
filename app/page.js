@@ -19,7 +19,7 @@ export default function Home() {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const { user, logout } = useAuth();
 
-  // Funktion um zu prüfen, ob ein Tag heute ist
+  // Prüft ob ein Tag heute ist
   const isToday = (dayKey) => {
     const today = new Date();
     const dayNames = ['sonntag', 'montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag'];
@@ -27,37 +27,34 @@ export default function Home() {
     return todayName === dayKey;
   };
 
-  // Funktion um den heutigen Tag zu finden
+  // Findet den Index des heutigen Tages
   const getTodayIndex = () => {
     const today = new Date();
     const dayNames = ['sonntag', 'montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag'];
     const todayName = dayNames[today.getDay()];
     const todayIndex = dayKeys.indexOf(todayName);
-    return todayIndex >= 0 ? todayIndex : 0; // Fallback auf Montag wenn nicht in der Liste
+    return todayIndex >= 0 ? todayIndex : 0;
   };
 
-  // Funktion um zu prüfen, ob ein Gericht bestellbar ist
   const isMealOrderable = (meal) => {
     return isToday(meal.day);
   };
 
-  // Funktion um zu prüfen, ob ein Gericht heute verfügbar ist
   const isMealAvailableToday = (meal) => {
     return isToday(meal.day);
   };
 
-  // Funktion um Allergen-Info zu öffnen
   const handleAllergenInfo = (meal) => {
     setSelectedMealForAllergen(meal);
     setShowAllergenModal(true);
   };
 
-  // Funktion um Logout durchzuführen
   const handleLogout = () => {
     logout();
     setShowUserDropdown(false);
   };
 
+  // Lädt Menüs von der API
   const fetchMenus = async () => {
     try {
       setLoading(true);
@@ -77,7 +74,6 @@ export default function Home() {
 
   useEffect(() => {
     fetchMenus();
-    // Setze automatisch auf den heutigen Tag
     const todayIndex = getTodayIndex();
     setCurrentDay(todayIndex);
   }, [showForm]);
@@ -125,17 +121,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
-      {/* Header */}
+      {/* Header mit Logo und User-Dropdown */}
       <header className="header-gradient text-white shadow-xl">
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 sm:space-x-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold">Mensa-BZZ</h1>
                 <p className="text-blue-100 text-xs sm:text-sm">Ihre digitale Mensa</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {user ? (
                 <div className="relative">
                   <button
@@ -156,7 +152,7 @@ export default function Home() {
                     </svg>
                   </button>
                   
-                  {/* Dropdown Menu */}
+                  {/* User-Dropdown mit Logout und Bestellhistorie */}
                   {showUserDropdown && (
                     <div className="absolute right-0 mt-2 w-40 sm:w-48 bg-white rounded-xl shadow-xl border border-white/20 z-50">
                       <div className="py-2">
@@ -208,10 +204,10 @@ export default function Home() {
         />
       )}
 
-      {/* Main Content */}
+      {/* Hauptinhalt */}
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
-          {/* Day Navigation */}
+          {/* Tag-Navigation */}
           <div className="mb-6 sm:mb-8">
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gradient">
@@ -229,7 +225,7 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Day Tabs */}
+            {/* Tag-Tabs mit Navigation */}
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-2 shadow-lg border border-white/30">
               <div className="flex justify-between items-center">
                 <button
@@ -266,7 +262,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Menu Grid */}
+          {/* Gerichte-Grid */}
           {menuItems.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -287,6 +283,7 @@ export default function Home() {
                     className="meal-card bg-card-hover fade-in"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
+                    {/* Gericht-Bild mit Overlay */}
                     <div className="relative h-56 overflow-hidden">
                       <img 
                         src={item.image} 
@@ -311,6 +308,7 @@ export default function Home() {
                       </div>
                     </div>
                     
+                    {/* Gericht-Details und Aktionen */}
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-2">
@@ -324,6 +322,7 @@ export default function Home() {
                           </span>
                         </div>
                         <div className="flex space-x-2">
+                          {/* Allergen-Info Button */}
                           <button
                             onClick={() => handleAllergenInfo(item)}
                             className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
@@ -333,6 +332,7 @@ export default function Home() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </button>
+                          {/* Admin-Buttons (nur für Admins sichtbar) */}
                           {user?.role === 'admin' && (
                             <>
                               <button
@@ -358,6 +358,7 @@ export default function Home() {
                         </div>
                       </div>
                       
+                      {/* Vorbestellen-Button */}
                       <div className="flex space-x-3">
                         <button
                           onClick={() => setSelectedMeal(item)}
@@ -375,7 +376,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* Quick Stats */}
+          {/* Statistik-Karten */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="glass-card rounded-2xl p-6">
               <div className="flex items-center space-x-4">
@@ -422,7 +423,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Floating Action Button for Admin */}
+      {/* Floating Action Button für Admin */}
       {user?.role === 'admin' && (
         <button
           onClick={handleAdd}
