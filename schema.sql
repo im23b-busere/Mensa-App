@@ -32,19 +32,25 @@ CREATE TABLE IF NOT EXISTS `menus` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Seed default menus so they can be managed like normal entries
+TRUNCATE TABLE menus;
+
 INSERT INTO `menus` (`title`, `image`, `student_price`, `teacher_price`, `day`) VALUES
-('H\xE4hnchen-Gem\xFCsepfanne mit Reis', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'montag'),
-('Spaghetti mit Hackfleisch-Tomatensauce', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'montag'),
-('Gem\xFCse-Lasagne mit Spinat und Ricotta', '/Download.jpg', 10.00, 12.00, 'montag'),
-('Rindergeschnetzeltes mit Reis', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'dienstag'),
-('Penne Arrabiata', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'dienstag'),
-('Gem\xFCse-Curry', '/Download.jpg', 10.00, 12.00, 'dienstag'),
-('Fischst\xE4bchen mit Kartoffelsalat', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'mittwoch'),
-('K\xE4sesp\xE4tzle', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'mittwoch'),
-('Tomaten-Mozzarella-Auflauf', '/Download.jpg', 10.00, 12.00, 'mittwoch'),
-('Schweinebraten mit Kn\xF6del', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'donnerstag'),
-('Nudelauflauf', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'donnerstag'),
-('Gr\xFCne Bohnen Eintopf', '/Download.jpg', 10.00, 12.00, 'donnerstag'),
-('Currywurst mit Pommes', '/reis_haehnchen_pfanne_2.jpg', 10.00, 12.00, 'freitag'),
-('Pizza Margherita', '/202_spaghetti-bolognese.jpg', 10.00, 12.00, 'freitag'),
-('Linsensuppe', '/Download.jpg', 10.00, 12.00, 'freitag');
+('Hähnchen-Gemüsepfanne mit Reis', '/reis_haehnchen_pfanne_2.jpg', 8.90, 10.90, 'montag'),
+('Spaghetti mit Hackfleisch-Tomatensauce', '/202_spaghetti-bolognese.jpg', 7.90, 9.90, 'montag'),
+('Gemüse-Lasagne mit Spinat und Ricotta', '/Download.jpg', 7.50, 9.50, 'montag'),
+
+('Rindergeschnetzeltes mit Reis', '/Geschnetzeltes-mit-Reis.jpg', 9.80, 11.80, 'dienstag'),
+('Penne Arrabiata', '/Penne-arrabbiata.jpg', 6.90, 8.90, 'dienstag'),
+('Gemüse-Curry', '/Gemüse-Curry.jpg', 7.20, 9.20, 'dienstag'),
+
+('Fischstäbchen mit Kartoffelsalat', '/Fischstäbchen-mit-Kartoffelsalat.jpg', 8.50, 10.50, 'mittwoch'),
+('Käsespätzle', '/Käsespätzle.jpg', 6.80, 8.80, 'mittwoch'),
+('Tomaten-Mozzarella-Auflauf', '/Tomaten-Mozzarella-Auflauf.jpg', 7.00, 9.00, 'mittwoch'),
+
+('Schweinebraten mit Knödel', '/Schweinebraten-mit-Knödel.jpg', 9.90, 11.90, 'donnerstag'),
+('Nudelauflauf', '/Nudelauflauf.jpg', 7.00, 9.00, 'donnerstag'),
+('Grüne Bohnen Eintopf', '/Grüne-Bohnen-Eintopf.jpg', 6.50, 8.50, 'donnerstag'),
+
+('Currywurst mit Pommes', '/Currywurst-Pommes.jpg', 7.90, 9.90, 'freitag'),
+('Pizza Margherita', '/PizzaMargherita.jpg', 6.90, 8.90, 'freitag'),
+('Linsensuppe', '/Linsensuppe.jpg', 5.90, 7.90, 'freitag');
