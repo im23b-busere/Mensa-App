@@ -33,18 +33,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-xl shadow">
-        <h1 className="text-center text-2xl font-bold text-gray-900">Registrieren</h1>
-        {error && <p className="text-center text-red-600">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      <div className="w-full max-w-md space-y-6 bg-white/90 backdrop-blur p-8 rounded-2xl shadow-xl border border-gray-100">
+        <h1 className="text-center text-3xl font-extrabold text-gray-900 tracking-tight">Registrieren</h1>
+        {error && <p className="text-center text-red-500 text-sm font-medium">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-5">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
             placeholder="Name"
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary/30 p-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 transition"
           />
           <input
             type="email"
@@ -52,7 +52,7 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="E-Mail-Adresse"
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary/30 p-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 transition"
           />
           <input
             type="password"
@@ -60,18 +60,18 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             placeholder="Passwort"
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary/30 p-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 transition"
           />
           <button
             type="submit"
-            className="w-full bg-primary text-white py-2 rounded hover:bg-primary-dark"
+            className="w-full bg-primary text-white py-3 rounded-lg font-semibold shadow hover:bg-primary-dark transition"
           >
             Registrieren
           </button>
         </form>
-        <p className="text-center text-sm">
+        <p className="text-center text-sm text-gray-500">
           Bereits registriert?{' '}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/login" className="text-primary font-medium hover:underline">
             Anmelden
           </Link>
         </p>

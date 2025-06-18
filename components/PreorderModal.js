@@ -58,14 +58,14 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
-      <div className="bg-white rounded-lg p-6 w-80 space-y-4">
-        <h3 className="text-lg font-semibold">{meal.title}</h3>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-30">
+      <div className="bg-white rounded-2xl p-7 w-full max-w-xs sm:max-w-sm space-y-5 shadow-2xl border border-gray-100">
+        <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">{meal.title}</h3>
         <input
           type="date"
           value={date}
           onChange={e => setDate(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary/30 p-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 transition"
         />
         <input
           type="time"
@@ -73,22 +73,22 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
           max="13:00"
           value={time}
           onChange={e => setTime(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary/30 p-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 transition"
         />
         {message && (
           <p
-            className={`text-center text-sm ${
+            className={`text-center text-sm font-medium ${
               message.toLowerCase().includes('erfolgreich')
                 ? 'text-green-600'
-                : 'text-red-600'
+                : 'text-red-500'
             }`}
           >
             {message}
           </p>
         )}
-        <div className="flex justify-end space-x-2">
-          <button onClick={onClose} className="px-4 py-2 rounded bg-gray-200">Abbrechen</button>
-          <button onClick={handleOrder} className="px-4 py-2 rounded bg-primary text-white">Bestellen</button>
+        <div className="flex justify-end gap-2 pt-2">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition font-medium">Abbrechen</button>
+          <button onClick={handleOrder} className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark transition font-medium">Bestellen</button>
         </div>
       </div>
     </div>

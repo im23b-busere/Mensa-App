@@ -13,27 +13,27 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-primary hover:text-primary-dark transition-colors">
+    <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur shadow z-20">
+      <div className="container mx-auto px-4 sm:px-8 py-3 flex justify-between items-center">
+        <Link href="/" className="text-2xl font-extrabold tracking-tight text-primary hover:text-primary-dark transition-colors">
           Mensa-BZZ
         </Link>
-        <div className="space-x-6">
+        <nav className="flex items-center gap-4 sm:gap-8">
           {isAuthenticated ? (
-            <button onClick={handleLogout} className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
+            <button onClick={handleLogout} className="text-gray-500 hover:text-primary-dark font-medium px-3 py-1 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30">
               Logout
             </button>
           ) : (
             <>
-              <Link href="/login" className="text-gray-600 hover:text-primary-dark font-medium transition-colors">
+              <Link href="/login" className="text-gray-500 hover:text-primary-dark font-medium px-3 py-1 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30">
                 Anmelden
               </Link>
-              <Link href="/register" className="text-gray-600 hover:text-primary-dark font-medium transition-colors">
+              <Link href="/register" className="text-gray-500 hover:text-primary-dark font-medium px-3 py-1 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30">
                 Registrieren
               </Link>
             </>
           )}
-        </div>
+        </nav>
       </div>
     </header>
   );

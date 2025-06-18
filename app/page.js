@@ -54,93 +54,95 @@ export default function Home() {
   const menuItems = menus[currentDayKey] || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="container mx-auto px-6 pt-8 pb-24">
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 shadow-lg">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-4xl font-bold text-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-blue-50">
+      <main className="container mx-auto px-2 pt-8 pb-32">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-between items-center mb-10">
+            <h1 className="text-4xl font-extrabold text-black drop-shadow-sm">
               {`Menu-${currentDayKey.charAt(0).toUpperCase() + currentDayKey.slice(1)}`}
             </h1>
-            {user?.role === 'admin' && (
-              <button
-                onClick={handleAdd}
-                className="text-3xl text-primary hover:text-primary-dark"
-              >
-                +
-              </button>
-            )}
           </div>
-          <div className="space-y-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {menuItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl p-8 shadow-md hover:shadow-lg transition-shadow"
+                className="relative bg-card p-0 overflow-hidden shadow-xl rounded-3xl group border border-gray-100 flex flex-col h-[420px]"
               >
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  <div className="w-full md:w-56 h-56 bg-gray-100 rounded-full overflow-hidden shadow-md">
-                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                <div className="relative h-2/3 w-full overflow-hidden flex items-center justify-center">
+                  <img src={item.image} alt={item.title} className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <h3 className="text-3xl font-bold text-white drop-shadow-lg mb-2">{item.title}</h3>
                   </div>
-                  <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-2xl font-semibold mb-6 text-gray-800">{item.title}</h3>
-                    <div className="space-y-3">
-                      <p className="text-gray-600 text-lg">
-                        <span className="font-medium">Schüler:</span> {item.student_price} CHF
-                      </p>
-                      <p className="text-gray-600 text-lg">
-                        <span className="font-medium">Lehrer:</span> {item.teacher_price} CHF
-                      </p>
-                    </div>
-                    <div className="mt-4 space-x-2">
-                      <button
-                        onClick={() => setSelectedMeal(item)}
-                        className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark"
-                      >
-                        Vorbestellen
-                      </button>
-                      {user?.role === 'admin' && (
-                        <>
-                          <button
-                            onClick={() => handleEdit(item)}
-                            className="px-3 py-2 bg-yellow-500 text-white rounded"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="px-3 py-2 bg-red-500 text-white rounded"
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
-                    </div>
+                </div>
+                <div className="flex-1 flex flex-col justify-between p-6">
+                  <div className="space-y-2">
+                    <p className="text-gray-700 text-lg">
+                      <span className="font-semibold text-black">Schüler:</span> {item.student_price} CHF
+                    </p>
+                    <p className="text-gray-700 text-lg">
+                      <span className="font-semibold text-black">Lehrer:</span> {item.teacher_price} CHF
+                    </p>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2 justify-end">
+                    <button
+                      onClick={() => setSelectedMeal(item)}
+                      className="btn-primary"
+                    >
+                      Vorbestellen
+                    </button>
+                    {user?.role === 'admin' && (
+                      <>
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="btn-secondary"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl px-5 py-2 transition"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
           </div>
+          {user?.role === 'admin' && (
+            <button
+              onClick={handleAdd}
+              className="fixed bottom-24 right-8 z-30 btn-primary w-16 h-16 rounded-full text-3xl flex items-center justify-center shadow-2xl hover:scale-110 transition-transform"
+              title="Add new meal"
+            >
+              +
+            </button>
+          )}
         </div>
       </main>
       <PreorderModal meal={selectedMeal || {}} isOpen={selectedMeal !== null} onClose={() => setSelectedMeal(null)} />
       {showForm && <MealForm day={currentDayKey} meal={editing} onClose={() => setShowForm(false)} />}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white shadow-sm">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-90 shadow-lg backdrop-blur-md z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between max-w-2xl mx-auto">
             <button
               onClick={() => setCurrentDay((prev) => (prev > 0 ? prev - 1 : dayKeys.length - 1))}
-              className="text-3xl text-gray-600 hover:text-gray-800 transition-colors p-2 hover:bg-gray-100 rounded-full"
+              className="text-3xl text-gray-500 hover:text-blue-600 transition-colors p-2 hover:bg-gray-100 rounded-full"
             >
               ←
             </button>
-            <div className="flex space-x-6">
+            <div className="flex space-x-4">
               {weekDays.map((day, index) => (
                 <button
                   key={day}
                   onClick={() => setCurrentDay(index)}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm ${
                     currentDay === index
-                      ? 'font-bold text-primary bg-gray-100'
-                      : 'text-gray-600 hover:text-primary hover:bg-gray-50'
+                      ? 'text-white bg-blue-500 shadow-md'
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-100'
                   }`}
                 >
                   {day}
@@ -149,7 +151,7 @@ export default function Home() {
             </div>
             <button
               onClick={() => setCurrentDay((prev) => (prev < dayKeys.length - 1 ? prev + 1 : 0))}
-              className="text-3xl text-gray-600 hover:text-gray-800 transition-colors p-2 hover:bg-gray-100 rounded-full"
+              className="text-3xl text-gray-500 hover:text-blue-600 transition-colors p-2 hover:bg-gray-100 rounded-full"
             >
               →
             </button>
