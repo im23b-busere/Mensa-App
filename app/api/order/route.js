@@ -37,11 +37,29 @@ export async function POST(req) {
     }
   }
 
+  // Benutzer-ID aus der Datenbank abrufen
+  let dbUser;
+  try {
+    const [users] = await pool.execute(
+      'SELECT id FROM users WHERE email = ?',
+      [user.email]
+    );
+    
+    if (users.length === 0) {
+      return NextResponse.json({ error: 'Benutzer nicht gefunden' }, { status: 404 });
+    }
+    
+    dbUser = users[0];
+  } catch (err) {
+    console.error('Fehler beim Abrufen des Benutzers:', err);
+    return NextResponse.json({ error: 'Datenbankfehler' }, { status: 500 });
+  }
+
   const pickupAt = `${date} ${time}`;
   try {
     await pool.query(
       'INSERT INTO orders (user_id, meal_name, pickup_at) VALUES (?, ?, ?)',
-      [user.id, mealName, pickupAt]
+      [dbUser.id, mealName, pickupAt]
     );
     return NextResponse.json({ success: true });
   } catch (err) {

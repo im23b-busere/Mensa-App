@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `user_id` INT UNSIGNED NOT NULL,
   `meal_name` VARCHAR(255) NOT NULL,
   `pickup_at` DATETIME NOT NULL,
+  `status` ENUM('pending', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
@@ -55,3 +56,10 @@ INSERT INTO `menus` (`title`, `image`, `student_price`, `teacher_price`, `day`) 
 ('Currywurst mit Pommes', '/Currywurst-Pommes.jpg', 7.90, 9.90, 'freitag'),
 ('Pizza Margherita', '/PizzaMargherita.jpg', 6.90, 8.90, 'freitag'),
 ('Linsensuppe', '/Linsensuppe.jpg', 5.90, 7.90, 'freitag');
+
+-- Update existing orders to have appropriate status based on pickup time
+UPDATE `orders` 
+SET `status` = CASE 
+  WHEN `pickup_at` < NOW() THEN 'completed'
+  ELSE 'pending'
+END;

@@ -46,13 +46,29 @@ export default function OrdersPage() {
   };
 
   const getStatusColor = (status) => {
-    // Da es keine Status-Spalte gibt, setzen wir alle Bestellungen als "completed"
-    return 'bg-green-100 text-green-800 border-green-200';
+    switch (status) {
+      case 'completed':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-slate-100 text-slate-800 border-slate-200';
+    }
   };
 
   const getStatusText = (status) => {
-    // Da es keine Status-Spalte gibt, setzen wir alle Bestellungen als "Abgeschlossen"
-    return 'Abgeschlossen';
+    switch (status) {
+      case 'completed':
+        return 'Abgeschlossen';
+      case 'pending':
+        return 'Ausstehend';
+      case 'cancelled':
+        return 'Storniert';
+      default:
+        return 'Unbekannt';
+    }
   };
 
   const formatDate = (dateString) => {
@@ -198,7 +214,7 @@ export default function OrdersPage() {
                 <div>
                   <p className="text-sm text-slate-600">Abgeschlossen</p>
                   <p className="text-2xl font-bold text-slate-800">
-                    {orders.length}
+                    {orders.filter(order => order.calculated_status === 'completed').length}
                   </p>
                 </div>
               </div>
@@ -214,7 +230,7 @@ export default function OrdersPage() {
                 <div>
                   <p className="text-sm text-slate-600">Ausstehend</p>
                   <p className="text-2xl font-bold text-slate-800">
-                    0
+                    {orders.filter(order => order.calculated_status === 'pending').length}
                   </p>
                 </div>
               </div>
@@ -259,8 +275,8 @@ export default function OrdersPage() {
                         <p className="text-sm text-slate-500">Bestellung #{order.id}</p>
                       </div>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor()}`}>
-                      {getStatusText()}
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.calculated_status)}`}>
+                      {getStatusText(order.calculated_status)}
                     </span>
                   </div>
                   

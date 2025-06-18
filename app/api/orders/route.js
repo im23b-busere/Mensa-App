@@ -21,6 +21,24 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Ungültiger Token' }, { status: 401 });
     }
 
+    // Benutzer-ID aus der Datenbank abrufen
+    let dbUser;
+    try {
+      const [users] = await pool.execute(
+        'SELECT id FROM users WHERE email = ?',
+        [user.email]
+      );
+      
+      if (users.length === 0) {
+        return NextResponse.json({ error: 'Benutzer nicht gefunden' }, { status: 404 });
+      }
+      
+      dbUser = users[0];
+    } catch (err) {
+      console.error('Fehler beim Abrufen des Benutzers:', err);
+      return NextResponse.json({ error: 'Datenbankfehler' }, { status: 500 });
+    }
+
     // Bestellungen des Benutzers abrufen
     const [orders] = await pool.execute(
       `SELECT 
@@ -29,11 +47,15 @@ export async function GET(request) {
         DATE(o.pickup_at) as date,
         TIME(o.pickup_at) as time,
         o.created_at,
-        o.user_id
+        o.user_id,
+        CASE 
+          WHEN o.pickup_at < NOW() THEN 'completed'
+          ELSE 'pending'
+        END as calculated_status
       FROM orders o
       WHERE o.user_id = ?
       ORDER BY o.created_at DESC`,
-      [user.id]
+      [dbUser.id]
     );
 
     return NextResponse.json({ 
