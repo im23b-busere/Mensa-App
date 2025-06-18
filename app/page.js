@@ -127,12 +127,12 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
       {/* Header */}
       <header className="header-gradient text-white shadow-xl">
-        <div className="container mx-auto px-6 py-8">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div>
-                <h1 className="text-3xl font-bold">Mensa-BZZ</h1>
-                <p className="text-blue-100 text-sm">Ihre digitale Mensa</p>
+                <h1 className="text-2xl sm:text-3xl font-bold">Mensa-BZZ</h1>
+                <p className="text-blue-100 text-xs sm:text-sm">Ihre digitale Mensa</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -140,36 +140,36 @@ export default function Home() {
                 <div className="relative">
                   <button
                     onClick={() => setShowUserDropdown(!showUserDropdown)}
-                    className="flex items-center space-x-3 hover:bg-white/10 rounded-lg p-2 transition-all duration-200"
+                    className="flex items-center space-x-2 sm:space-x-3 hover:bg-white/10 rounded-lg p-2 transition-all duration-200"
                   >
-                    <div className="text-right">
+                    <div className="text-right hidden sm:block">
                       <p className="text-sm text-blue-100">Willkommen</p>
                       <p className="font-semibold">{user.name}</p>
                     </div>
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
-                    <svg className="w-4 h-4 text-blue-100 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 text-blue-100 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
                   
                   {/* Dropdown Menu */}
                   {showUserDropdown && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-white/20 z-50">
+                    <div className="absolute right-0 mt-2 w-40 sm:w-48 bg-white rounded-xl shadow-xl border border-white/20 z-50">
                       <div className="py-2">
-                        <div className="px-4 py-2 border-b border-slate-100">
-                          <p className="text-sm text-slate-500">Angemeldet als</p>
-                          <p className="font-semibold text-slate-800">{user.name}</p>
+                        <div className="px-3 sm:px-4 py-2 border-b border-slate-100">
+                          <p className="text-xs sm:text-sm text-slate-500">Angemeldet als</p>
+                          <p className="font-semibold text-slate-800 text-sm sm:text-base">{user.name}</p>
                           <p className="text-xs text-slate-400 capitalize">{user.role}</p>
                         </div>
                         <button
                           onClick={handleLogout}
-                          className="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 transition-colors duration-200 flex items-center space-x-3"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-left text-slate-700 hover:bg-slate-50 transition-colors duration-200 flex items-center space-x-2 sm:space-x-3 text-sm sm:text-base"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
                           <span>Abmelden</span>
@@ -179,9 +179,9 @@ export default function Home() {
                             window.location.href = '/orders';
                             setShowUserDropdown(false);
                           }}
-                          className="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 transition-colors duration-200 flex items-center space-x-3"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-left text-slate-700 hover:bg-slate-50 transition-colors duration-200 flex items-center space-x-2 sm:space-x-3 text-sm sm:text-base"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                           </svg>
                           <span>Bestellhistorie</span>
@@ -191,7 +191,7 @@ export default function Home() {
                   )}
                 </div>
               ) : (
-                <a href="/login" className="btn-secondary">
+                <a href="/login" className="btn-secondary text-sm sm:text-base px-3 sm:px-4 py-2 sm:py-3">
                   Anmelden
                 </a>
               )}
@@ -209,16 +209,16 @@ export default function Home() {
       )}
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
           {/* Day Navigation */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gradient">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gradient">
                 {weekDays[currentDay]} - Speiseplan
               </h2>
               <div className="flex items-center space-x-2">
-                <span className="text-slate-600 font-medium">
+                <span className="text-slate-600 font-medium text-sm sm:text-base">
                   {new Date().toLocaleDateString('de-DE', { 
                     weekday: 'long', 
                     year: 'numeric', 
