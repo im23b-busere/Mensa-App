@@ -90,8 +90,8 @@ body {
 
 /* Secondary button */
 .btn-secondary {
-  @apply bg-white/90 hover:bg-white text-slate-700 font-medium rounded-lg px-5 py-2.5 
-         border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md 
+  @apply bg-white/90 hover:bg-white text-slate-700 font-medium rounded-lg px-5 py-2.5
+         border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md
          transition-all duration-200;
 }
 
