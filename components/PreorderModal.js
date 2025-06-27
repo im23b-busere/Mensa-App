@@ -1,11 +1,43 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function PreorderModal({ meal, isOpen, onClose }) {
+  // Datum auf heutigen Tag setzen
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Datum beim Öffnen des Modals setzen
+  useEffect(() => {
+    if (isOpen) {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      setDate(`${yyyy}-${mm}-${dd}`);
+      setTime('');
+      setMessage('');
+    }
+  }, [isOpen]);
+
+  // Hilfsfunktion für Zeitoptionen
+  const generateTimeOptions = () => {
+    const options = [];
+    let hour = 11;
+    let minute = 0;
+    while (hour < 13 || (hour === 13 && minute === 0)) {
+      const h = String(hour).padStart(2, '0');
+      const m = String(minute).padStart(2, '0');
+      options.push(`${h}:${m}`);
+      minute += 15;
+      if (minute === 60) {
+        minute = 0;
+        hour++;
+      }
+    }
+    return options;
+  };
 
   const handleOrder = async () => {
     const token = localStorage.getItem('token');
@@ -134,30 +166,28 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Abholdatum
             </label>
-            <input
-              type="date"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              className="input-field"
-              min={new Date().toISOString().split('T')[0]}
-            />
+            <div className="input-field bg-gray-100 cursor-not-allowed select-none">
+              {(() => {
+                const d = new Date(date);
+                return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+              })()}
+            </div>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Abholzeit
             </label>
-            <input
-              type="time"
-              min="11:00"
-              max="13:00"
+            <select
               value={time}
               onChange={e => setTime(e.target.value)}
               className="input-field"
-            />
-            <p className="text-xs text-slate-500 mt-1">
-              Bestellungen nur von 11:00 bis 13:00 Uhr möglich
-            </p>
+            >
+              <option value="">Bitte auswählen</option>
+              {generateTimeOptions().map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
           </div>
 
           {/* Message */}
@@ -208,7 +238,6 @@ export default function PreorderModal({ meal, isOpen, onClose }) {
             <div className="text-xs text-slate-600">
               <p className="font-medium mb-1">Wichtige Hinweise:</p>
               <ul className="space-y-1">
-                <li>• Bestellungen sind für zukünftige Tage möglich</li>
                 <li>• Gerichte sind nur an ihrem zugewiesenen Tag verfügbar</li>
                 <li>• Abholung zwischen 11:00 und 13:00 Uhr</li>
                 <li>• Bezahlung erfolgt bei der Abholung</li>
