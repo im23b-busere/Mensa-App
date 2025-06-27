@@ -1,69 +1,142 @@
 import { NextResponse } from 'next/server';
-import { verifyToken } from '../../../middleware/auth';
-import pool from '../../../lib/db';
+import { verifyToken } from '../../middleware/auth';
+import { query } from '../../../lib/db';
 
-export async function POST(req) {
-  let user;
+// POST: Neue Bestellung erstellen
+export async function POST(request) {
   try {
-    user = verifyToken(req);
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { mealName, date, time, day } = await req.json();
-  if (!mealName || !date || !time) {
-    return NextResponse.json({ error: 'Alle Felder erforderlich' }, { status: 400 });
-  }
-
-  // Zeitfenster validieren (11:00 - 13:00)
-  const [hour, minute] = time.split(':').map(Number);
-  if (hour < 11 || hour > 13 || (hour === 13 && minute > 0)) {
-    return NextResponse.json({ error: 'Zeit ausserhalb des erlaubten Fensters' }, { status: 400 });
-  }
-
-  // Datum validieren - muss in der Zukunft liegen
-  const selectedDate = new Date(date);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (selectedDate < today) {
-    return NextResponse.json({ error: 'Bestellungen können nur für zukünftige Tage getätigt werden' }, { status: 400 });
-  }
-
-  // Tag validieren - das Gericht muss an dem gewählten Tag verfügbar sein
-  if (day) {
-    const weekday = new Date(date).toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
-    if (weekday !== day.toLowerCase()) {
-      return NextResponse.json({ error: `Dieses Gericht ist nur am ${day.charAt(0).toUpperCase() + day.slice(1)} verfügbar` }, { status: 400 });
+    // Token verifizieren und Benutzer-ID extrahieren
+    const token = request.headers.get('authorization')?.split(' ')[1];
+    if (!token) {
+      return NextResponse.json({ error: 'Token erforderlich' }, { status: 401 });
     }
-  }
 
-  // Benutzer-ID aus der Datenbank abrufen
-  let dbUser;
-  try {
-    const [users] = await pool.execute(
-      'SELECT id FROM users WHERE email = ?',
-      [user.email]
-    );
-    
-    if (users.length === 0) {
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return NextResponse.json({ error: 'Ungültiger Token' }, { status: 401 });
+    }
+
+    // Benutzer-ID aus Datenbank abrufen (da JWT nur Email enthält)
+    const userResult = await query('SELECT id FROM users WHERE email = ?', [decoded.email]);
+    if (userResult.length === 0) {
       return NextResponse.json({ error: 'Benutzer nicht gefunden' }, { status: 404 });
     }
-    
-    dbUser = users[0];
-  } catch (err) {
-    console.error('Fehler beim Abrufen des Benutzers:', err);
-    return NextResponse.json({ error: 'Datenbankfehler' }, { status: 500 });
-  }
+    const userId = userResult[0].id;
 
-  const pickupAt = `${date} ${time}`;
-  try {
-    await pool.query(
-      'INSERT INTO orders (user_id, meal_name, pickup_at) VALUES (?, ?, ?)',
-      [dbUser.id, mealName, pickupAt]
+    // Request-Body parsen
+    const { mealId, pickupTime, quantity } = await request.json();
+
+    // Validierung der Eingaben
+    if (!mealId || !pickupTime || !quantity) {
+      return NextResponse.json({ error: 'Alle Felder sind erforderlich' }, { status: 400 });
+    }
+
+    if (quantity < 1 || quantity > 10) {
+      return NextResponse.json({ error: 'Menge muss zwischen 1 und 10 liegen' }, { status: 400 });
+    }
+
+    // Prüfen ob das Gericht existiert
+    const mealResult = await query('SELECT * FROM menus WHERE id = ?', [mealId]);
+    if (mealResult.length === 0) {
+      return NextResponse.json({ error: 'Gericht nicht gefunden' }, { status: 404 });
+    }
+
+    const meal = mealResult[0];
+
+    // Validierung der Abholzeit
+    const pickupDateTime = new Date(pickupTime);
+    const now = new Date();
+
+    // Prüfen ob Abholzeit in der Zukunft liegt
+    if (pickupDateTime <= now) {
+      return NextResponse.json({ error: 'Abholzeit muss in der Zukunft liegen' }, { status: 400 });
+    }
+
+    // Prüfen ob Abholzeit nicht zu weit in der Zukunft liegt (max. 7 Tage)
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 7);
+    if (pickupDateTime > maxDate) {
+      return NextResponse.json({ error: 'Bestellungen sind nur bis zu 7 Tage im Voraus möglich' }, { status: 400 });
+    }
+
+    // Prüfen ob das Gericht am gewählten Tag verfügbar ist
+    const selectedDay = pickupDateTime.toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
+    if (selectedDay !== meal.day) {
+      return NextResponse.json({ 
+        error: `Dieses Gericht ist nur am ${meal.day.charAt(0).toUpperCase() + meal.day.slice(1)} verfügbar` 
+      }, { status: 400 });
+    }
+
+    // Prüfen ob Abholzeit im erlaubten Zeitfenster liegt (11:00-13:00)
+    const hour = pickupDateTime.getHours();
+    if (hour < 11 || hour >= 13) {
+      return NextResponse.json({ error: 'Abholungen sind nur zwischen 11:00 und 13:00 Uhr möglich' }, { status: 400 });
+    }
+
+    // Bestellung in Datenbank speichern
+    const result = await query(
+      'INSERT INTO orders (user_id, meal_id, pickup_time, quantity, created_at) VALUES (?, ?, ?, ?, NOW())',
+      [userId, mealId, pickupTime, quantity]
     );
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: 'Bestellung fehlgeschlagen' }, { status: 500 });
+
+    return NextResponse.json({ 
+      message: 'Bestellung erfolgreich erstellt',
+      orderId: result.insertId 
+    });
+
+  } catch (error) {
+    console.error('Fehler beim Erstellen der Bestellung:', error);
+    return NextResponse.json({ error: 'Interner Serverfehler' }, { status: 500 });
+  }
+}
+
+// GET: Bestellungen eines Benutzers abrufen
+export async function GET(request) {
+  try {
+    // Token verifizieren
+    const token = request.headers.get('authorization')?.split(' ')[1];
+    if (!token) {
+      return NextResponse.json({ error: 'Token erforderlich' }, { status: 401 });
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return NextResponse.json({ error: 'Ungültiger Token' }, { status: 401 });
+    }
+
+    // Benutzer-ID aus Datenbank abrufen
+    const userResult = await query('SELECT id FROM users WHERE email = ?', [decoded.email]);
+    if (userResult.length === 0) {
+      return NextResponse.json({ error: 'Benutzer nicht gefunden' }, { status: 404 });
+    }
+    const userId = userResult[0].id;
+
+    // Bestellungen mit Gericht-Details abrufen
+    const orders = await query(`
+      SELECT 
+        o.id,
+        o.pickup_time,
+        o.quantity,
+        o.created_at,
+        m.title,
+        m.image,
+        m.student_price,
+        m.teacher_price,
+        m.day,
+        CASE 
+          WHEN o.pickup_time < NOW() THEN 'completed'
+          ELSE 'pending'
+        END as status
+      FROM orders o
+      JOIN menus m ON o.meal_id = m.id
+      WHERE o.user_id = ?
+      ORDER BY o.created_at DESC
+    `, [userId]);
+
+    return NextResponse.json({ orders });
+
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    return NextResponse.json({ error: 'Interner Serverfehler' }, { status: 500 });
   }
 }
